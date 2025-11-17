@@ -1,170 +1,95 @@
 #include <iostream>
 #include <fstream>
-#include <string>
-#include <vector>
-#include <ctime>
-#include <cstdlib>
+#include <cstdlib>   // for exit()
 using namespace std;
-class Analytics;
+
 class Habit {
 protected:
     string name;
     int hours;
+
 public:
-    Habit(string n = "Unknown", int h = 0) : name(n), hours(h) {}
-    virtual void input() {
-        cout << "Enter habit name: ";
+    void input() {
+        cout << "Enter habit name:";
         cin >> name;
-        cout << "Enter hours spent today: ";
+        cout << "Enter hours:";
         cin >> hours;
+
+        if(hours > 24){
+            cout << "Invalid Input! Hours cannot be more than 24.\n";
+            cout << "Program Terminated.\n";
+            exit(0);   // <-- Ends the program immediately
+        }
     }
-    virtual void display() const {
-        cout << "Habit: " << name << " | Hours: " << hours << endl;
+
+    virtual int score() {
+        return 0;
     }
-    virtual int score() const = 0; 
-    friend class Analytics;
+
+    void show() {
+        cout << "Habit: " << name << " | Hours: " << hours;
+    }
 };
+
 class PhysicalHabit : public Habit {
 public:
-    PhysicalHabit(string n = "Workout", int h = 0) : Habit(n, h) {}
-    int score() const override {
-        return hours * 10; 
+    int score() override {
+        return hours * 10;
     }
 };
+
 class DigitalHabit : public Habit {
 public:
-    DigitalHabit(string n = "Coding", int h = 0) : Habit(n, h) {}
-    int score() const override {
+    int score() override {
         return hours * 7;
     }
 };
-class User {
-    string username;
-    vector<Habit*> habits;
-    static int userCount; 
-public:
-    User(string name = "Guest") : username(name) {
-        userCount++;
-    }
-    void addHabit(Habit* h) {
-        habits.push_back(h);
-    }
-    void showHabits() const {
-        cout << "\n📊 Habits for " << username << ":\n";
-        for (auto h : habits) {
-            h->display();
-            cout << "Score: " << h->score() << "\n";
-        }
-    }
-    int totalScore() const {
-        int total = 0;
-        for (auto h : habits)
-            total += h->score();
-        return total;
-    }
-    bool operator>(const User &other) const {
-        return this->totalScore() > other.totalScore();
-    }
-    static void showUserCount() {
-        cout << "\n👥 Total Users: " << userCount << endl;
-    }
-    string getName() const { return username; }
-    friend class Analytics;
-};
-int User::userCount = 0; // Definition of static member
-class Analytics {
-public:
-    static void showTrends(const User &u) {
-        cout << "\n📈 Habit Progress for " << u.username << ":\n";
-        int total = u.totalScore();
-        int bars = total / 10;
-        cout << "Progress: ";
-        for (int i = 0; i < bars; i++) cout << "█";
-        cout << " (" << total << " points)\n";
-        if (total > 150)
-            cout << "🔥 Excellent consistency! Keep it up!\n";
-        else if (total > 80)
-            cout << "💪 Good progress! Stay steady!\n";
-        else
-            cout << "🌱 Small steps matter. Try to build a routine!\n";
-    }
-};
-void saveToFile(const User &u) {
+
+// File Handling Function
+void saveToFile(string user, int score) {
     ofstream file("habit_data.txt", ios::app);
-    if (!file) {
-        cerr << "Error opening file!\n";
-        return;
-    }
-    file << "User: " << u.getName() << " | Score: " << u.totalScore() << endl;
+    file << "User: " << user << " | Score: " << score << endl;
     file.close();
 }
-string getMotivationalQuote() {
-    string quotes[] = {
-        "Discipline is stronger than motivation.",
-        "Little progress each day adds up to big results.",
-        "The secret of success is consistency.",
-        "Dream big. Work hard. Stay humble.",
-        "Your future depends on what you do today."
-    };
-    int idx = rand() % 5;
-    return quotes[idx];
-}
-int main() {
-    srand(time(0)); // for random quotes
-    cout << "==============================\n";
-    cout << " 🧠 AI-Based Habit Tracker\n";
-    cout << "==============================\n";
 
+int main() {
     string username;
-    cout << "\nEnter your name: ";
+    cout << "Enter your name: ";
     cin >> username;
 
-    User user1(username);
     int choice;
+    int totalScore = 0;
 
     do {
         cout << "\n1. Add Physical Habit";
         cout << "\n2. Add Digital Habit";
-        cout << "\n3. Show All Habits";
-        cout << "\n4. Analyze Progress";
-        cout << "\n5. Save to File";
-        cout << "\n6. Exit";
+        cout << "\n3. Show Total Score";
+        cout << "\n4. Save & Exit";
         cout << "\nEnter choice: ";
         cin >> choice;
 
-        switch (choice) {
-        case 1: {
-            PhysicalHabit* ph = new PhysicalHabit();
-            ph->input();
-            user1.addHabit(ph);
-            break;
+        if (choice == 1) {
+            PhysicalHabit ph;
+            ph.input(); 
+            totalScore += ph.score();
+            ph.show();
+            cout << " | Score: " << ph.score() << endl;
         }
-        case 2: {
-            DigitalHabit* dh = new DigitalHabit();
-            dh->input();
-            user1.addHabit(dh);
-            break;
+        else if (choice == 2) {
+            DigitalHabit dh;
+            dh.input();
+            totalScore += dh.score();
+            dh.show();
+            cout << " | Score: " << dh.score() << endl;
         }
-        case 3:
-            user1.showHabits();
-            break;
-        case 4:
-            Analytics::showTrends(user1);
-            cout << "\n🤖 Quote: " << getMotivationalQuote() << endl;
-            break;
-        case 5:
-            saveToFile(user1);
-            cout << "✅ Data saved successfully!\n";
-            break;
-        case 6:
-            cout << "Exiting tracker... Goodbye!\n";
-            break;
-        default:
-            cout << "Invalid choice!\n";
+        else if (choice == 3) {
+            cout << "Total Score: " << totalScore << endl;
         }
-    } while (choice != 6);
-
-    User::showUserCount();
+        else if (choice == 4) {
+            saveToFile(username, totalScore);
+            cout << "Saved! Goodbye.\n";
+        }
+    } while (choice != 4);
 
     return 0;
 }
