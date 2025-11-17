@@ -3,15 +3,9 @@
 #include <string>
 #include <vector>
 #include <ctime>
-#include <cstdlib>  // for rand()
+#include <cstdlib>
 using namespace std;
-
-// 🔹 Forward declaration
 class Analytics;
-
-// =======================================================
-// CLASS: Habit (Base Class)
-// =======================================================
 class Habit {
 protected:
     string name;
@@ -27,49 +21,34 @@ public:
     virtual void display() const {
         cout << "Habit: " << name << " | Hours: " << hours << endl;
     }
-    virtual int score() const = 0; // 🔹 Pure virtual (for polymorphism)
+    virtual int score() const = 0; 
     friend class Analytics;
 };
-
-// =======================================================
-// DERIVED CLASS 1: PhysicalHabit
-// =======================================================
 class PhysicalHabit : public Habit {
 public:
     PhysicalHabit(string n = "Workout", int h = 0) : Habit(n, h) {}
     int score() const override {
-        return hours * 10; // more hours = better score
+        return hours * 10; 
     }
 };
-
-// =======================================================
-// DERIVED CLASS 2: DigitalHabit
-// =======================================================
 class DigitalHabit : public Habit {
 public:
     DigitalHabit(string n = "Coding", int h = 0) : Habit(n, h) {}
     int score() const override {
-        return hours * 7; // slightly lesser score weight
+        return hours * 7;
     }
 };
-
-// =======================================================
-// CLASS: User
-// =======================================================
 class User {
     string username;
     vector<Habit*> habits;
-    static int userCount; // 🔹 Static member
-
+    static int userCount; 
 public:
     User(string name = "Guest") : username(name) {
         userCount++;
     }
-
     void addHabit(Habit* h) {
         habits.push_back(h);
     }
-
     void showHabits() const {
         cout << "\n📊 Habits for " << username << ":\n";
         for (auto h : habits) {
@@ -77,32 +56,22 @@ public:
             cout << "Score: " << h->score() << "\n";
         }
     }
-
     int totalScore() const {
         int total = 0;
         for (auto h : habits)
             total += h->score();
         return total;
     }
-
-    // 🔹 Operator Overloading: Compare users by consistency
     bool operator>(const User &other) const {
         return this->totalScore() > other.totalScore();
     }
-
     static void showUserCount() {
         cout << "\n👥 Total Users: " << userCount << endl;
     }
-
     string getName() const { return username; }
-
     friend class Analytics;
 };
 int User::userCount = 0; // Definition of static member
-
-// =======================================================
-// CLASS: Analytics (Friend Class)
-// =======================================================
 class Analytics {
 public:
     static void showTrends(const User &u) {
@@ -112,8 +81,6 @@ public:
         cout << "Progress: ";
         for (int i = 0; i < bars; i++) cout << "█";
         cout << " (" << total << " points)\n";
-
-        // AI-like feedback
         if (total > 150)
             cout << "🔥 Excellent consistency! Keep it up!\n";
         else if (total > 80)
@@ -122,10 +89,6 @@ public:
             cout << "🌱 Small steps matter. Try to build a routine!\n";
     }
 };
-
-// =======================================================
-// FILE HANDLING: Save user progress
-// =======================================================
 void saveToFile(const User &u) {
     ofstream file("habit_data.txt", ios::app);
     if (!file) {
@@ -135,10 +98,6 @@ void saveToFile(const User &u) {
     file << "User: " << u.getName() << " | Score: " << u.totalScore() << endl;
     file.close();
 }
-
-// =======================================================
-// RANDOM QUOTES GENERATOR
-// =======================================================
 string getMotivationalQuote() {
     string quotes[] = {
         "Discipline is stronger than motivation.",
@@ -150,10 +109,6 @@ string getMotivationalQuote() {
     int idx = rand() % 5;
     return quotes[idx];
 }
-
-// =======================================================
-// MAIN FUNCTION
-// =======================================================
 int main() {
     srand(time(0)); // for random quotes
     cout << "==============================\n";
