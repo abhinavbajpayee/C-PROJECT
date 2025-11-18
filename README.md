@@ -1,73 +1,59 @@
 #include <iostream>
 #include <fstream>
-#include <cstdlib>   // for exit()
+#include <cstdlib>   
 using namespace std;
-
 class Habit {
 protected:
     string name;
     int hours;
-
 public:
     void input() {
-        cout << "Enter habit name:";
-        cin >> name;
-        cout << "Enter hours:";
-        cin >> hours;
-
-        if(hours > 24){
-            cout << "Invalid Input! Hours cannot be more than 24.\n";
-            cout << "Program Terminated.\n";
-            exit(0);   // <-- Ends the program immediately
-        }
-    }
-
-    virtual int score() {
+    cin.ignore(); 
+    cout << "Enter habit name: ";
+    getline(cin, name);
+    cout << "Enter hours: ";
+    cin >> hours;
+    if(hours > 24){
+        cout << "Invalid Input! Hours cannot be more than 24.\n";
+        cout << "Program Terminated.\n";
+        exit(1);
+    }}
+virtual int score() {
         return 0;
     }
-
-    void show() {
-        cout << "Habit: " << name << " | Hours: " << hours;
-    }
-};
+void show() {
+        cout << "Habit:" << name << "|Hours:" << hours;
+    }};
 
 class PhysicalHabit : public Habit {
 public:
     int score() override {
         return hours * 10;
-    }
-};
-
+    }};
 class DigitalHabit : public Habit {
 public:
     int score() override {
         return hours * 7;
-    }
-};
-
-// File Handling Function
+    }};
 void saveToFile(string user, int score) {
     ofstream file("habit_data.txt", ios::app);
-    file << "User: " << user << " | Score: " << score << endl;
+    file << "User:" << user << "| Score:" << score << endl;
     file.close();
 }
-
 int main() {
     string username;
-    cout << "Enter your name: ";
-    cin >> username;
-
+    cout << "Enter your name:";
+    cin.ignore();            
+    getline(cin, username);
     int choice;
     int totalScore = 0;
-
     do {
-        cout << "\n1. Add Physical Habit";
-        cout << "\n2. Add Digital Habit";
-        cout << "\n3. Show Total Score";
-        cout << "\n4. Save & Exit";
-        cout << "\nEnter choice: ";
+        cout << "1. Add Physical Habit\n";
+        cout << "2. Add Digital Habit\n";
+        cout << "3. Show Total Score\n";
+        cout << "4. Save & Exit\n";
+        cout << "Enter choice: ";
         cin >> choice;
-
         if (choice == 1) {
             PhysicalHabit ph;
             ph.input(); 
@@ -89,7 +75,7 @@ int main() {
             saveToFile(username, totalScore);
             cout << "Saved! Goodbye.\n";
         }
-    } while (choice != 4);
-
+    } 
+    while (choice != 4);
     return 0;
 }
